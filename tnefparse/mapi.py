@@ -33,7 +33,7 @@ def decode_mapi(data):
    attrs = []
    offset = 0
    num_properties = bytes_to_int(data[offset:offset+4]); offset += 4
-#   logger.debug("%i MAPI properties" % num_properties)
+   logger.debug("%i MAPI properties" % num_properties)
 
    try:
       for i in range(num_properties):
@@ -77,10 +77,11 @@ def decode_mapi(data):
 
 #            logger.debug("Number of values: %i" % num_vals)
             attr_data = []
+            cdat = None
             for j in range(num_vals):
                # inlined version of bytes_to_int, for performance:
-               #length = ord(offset[0]) + (ord(offset[1]) << 8) + (ord(offset[2]) << 16) + (ord(offset[3]) << 24)
-               length = bytes_to_int(data[offset:offset+4])
+               cdat = data[offset:offset+4]
+               length = ord(cdat[0]) + (ord(cdat[1]) << 8) + (ord(cdat[2]) << 16) + (ord(cdat[3]) << 24)
                offset += 4
                q,r = divmod(length, 4)
                if r != 0:
@@ -530,6 +531,8 @@ class TNEFMAPI_Attribute(object):
    MAPI_YPOS = 0x3F06
    MAPI_CONTROL_ID = 0x3F07
    MAPI_INITIAL_DETAILS_PANE = 0x3F08
+   MAPI_PR_MSG_EDITOR_FORMAT = 0X5909
+   MAPI_SENT_REPRESENTING_SMTP_ADDRESS = 0x5D02 
    MAPI_ID_SECURE_MIN = 0x67F0
    MAPI_ID_SECURE_MAX = 0x67FF
 
@@ -956,7 +959,9 @@ class TNEFMAPI_Attribute(object):
       MAPI_CONTROL_ID                                 :  "MAPI_CONTROL_ID",
       MAPI_INITIAL_DETAILS_PANE                       :  "MAPI_INITIAL_DETAILS_PANE",
       MAPI_ID_SECURE_MIN                              :  "MAPI_ID_SECURE_MIN",
-      MAPI_ID_SECURE_MAX                              :  "MAPI_ID_SECURE_MAX"
+      MAPI_ID_SECURE_MAX                              :  "MAPI_ID_SECURE_MAX",
+      MAPI_SENT_REPRESENTING_SMTP_ADDRESS             :  "MAPI_SENT_REPRESENTING_SMTP_ADDRESS",
+      MAPI_PR_MSG_EDITOR_FORMAT                       :  "MAPI_PR_MSG_EDITOR_FORMAT"
    }
 
    OutlookGuid = '05133f00aa00da98101b450b6ed8da90'
