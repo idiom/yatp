@@ -1,8 +1,11 @@
-import os, sys, logging
-
-logging.basicConfig()
+import os
+import sys
+import logging
+import pytest
 
 from tnefparse import TNEF
+
+logging.basicConfig()
 
 datadir = os.path.dirname(os.path.realpath(__file__)) + os.sep + "examples"
 
@@ -37,10 +40,16 @@ objnames = lambda t: [TNEF.codes[o.name] for o in t.objects]
 objcodes = lambda t: [o.name for o in t.objects]
 
 def test_decode(tnefspec):
-   fn, key, attchs, objs = tnefspec
-   with open(datadir + os.sep + fn, "rb") as tfile:
-      t = TNEF(tfile.read())
-      assert t.key == key, "wrong key: 0x%2.2x" % t.key
-      assert objcodes(t) == objs, "wrong objs: %s" % ["0x%2.2x" % o.name for o in t.objects]
-      assert [a.name for a in t.attachments] == attchs
+    fn, key, attchs, objs = tnefspec
+    with open(datadir + os.sep + fn, "rb") as tfile:
+        t = TNEF(tfile.read())
+        assert t.key == key, "wrong key: 0x%2.2x" % t.key
+        assert objcodes(t) == objs, "wrong objs: %s" % ["0x%2.2x" % o.name for o in t.objects]
+        assert [a.name for a in t.attachments] == attchs
 
+def test_badsig():
+    with pytest.raises(Exception) as bsig:
+        tfile = open(datadir + os.sep + "bad-sig.tnef", "rb")
+        t=TNEF(tfile.read())
+    assert bsig.value.message == "Wrong TNEF signature: 0x41414141" 
+        
